@@ -1,11 +1,9 @@
 package com.example.demo.photogallery
 
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
+import android.support.v4.app.Fragment
 
 class PhotoGalleryActivity : BaseFragmentActivity() {
-
-   override fun createFragment():Fragment{
-
-   }
+    override fun createFragment(): Fragment {
+        return PhotoGalleryFragment.newInstance()
+    }
 }
