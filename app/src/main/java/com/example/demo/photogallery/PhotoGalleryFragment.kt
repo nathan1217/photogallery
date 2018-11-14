@@ -28,7 +28,7 @@ class PhotoGalleryFragment : Fragment() {
     ): View? {
         var v: View = inflater.inflate(R.layout.fragment_photo_gallery, container, false)
         mPhotoRecyclerView = v.findViewById(R.id.photo_recycler_view)
-        mPhotoRecyclerView.layoutManager = GridLayoutManager(activity, 3)
+        mPhotoRecyclerView.layoutManager = GridLayoutManager(activity!!, 3)
         return v
     }
 
@@ -36,7 +36,7 @@ class PhotoGalleryFragment : Fragment() {
         override fun doInBackground(vararg params: Void): Void? {
             try {
                 val result = FlickrFetchr()
-                    .getUrlString("https://www.bignerdranch.com")
+                    .getUrlString("https://www.baidu.com")
                 Log.i(TAG, "Fetched contents of URL: $result")
             } catch (ioe: IOException) {
                 Log.e(TAG, "Failed to fetch URL: ", ioe)

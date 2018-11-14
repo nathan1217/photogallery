@@ -24,6 +24,7 @@ class FlickrFetchr {
             var bytesRead = inputStream.read(buffer)
             while (bytesRead > 0) {
                 out.write(buffer, 0, bytesRead)
+                bytesRead = inputStream.read(buffer)
             }
             out.close()
             return out.toByteArray()
