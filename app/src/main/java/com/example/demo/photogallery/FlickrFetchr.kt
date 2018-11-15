@@ -3,7 +3,6 @@ package com.example.demo.photogallery
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
-import java.net.HttpURLConnection.HTTP_OK
 import java.net.URL
 
 
@@ -36,5 +35,15 @@ class FlickrFetchr {
     @Throws(IOException::class)
     fun getUrlString(urlSpec: String): String {
         return String(getUrlBytes(urlSpec))
+    }
+
+    @Throws(IOException::class)
+    fun getItems(urlSpec: String): ArrayList<GalleryItem> {
+        val items = ArrayList<GalleryItem>()
+        getUrlString(urlSpec)
+        for (i in 1..20) {
+            items.add(GalleryItem(i.toString(), "mCaption_$i", """mUrl_$i"""))
+        }
+        return items
     }
 }
