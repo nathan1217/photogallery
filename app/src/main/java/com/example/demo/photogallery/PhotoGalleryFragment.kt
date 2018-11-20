@@ -20,8 +20,6 @@ import android.content.ClipData.newIntent
 import android.content.Intent
 
 
-
-
 class PhotoGalleryFragment : Fragment() {
     private lateinit var mPhotoRecyclerView: RecyclerView
     private var mItems = ArrayList<GalleryItem>()
@@ -32,8 +30,7 @@ class PhotoGalleryFragment : Fragment() {
         setHasOptionsMenu(true)
         updateItems()
 
-        val i = PollService.newIntent(activity!!)
-        activity!!.startService(i)
+//        PollService.setServiceAlarm(activity!!, true)
 
         var responseHandler: Handler = Handler()
         mThumbnailDownloader = ThumbnailDownloader<PhotoHolder>(responseHandler)
@@ -89,6 +86,12 @@ class PhotoGalleryFragment : Fragment() {
             val query = QueryPreferences.getStoredQuery(activity!!)
             searchView.setQuery(query, false)
         }
+        val toggleItem = menu.findItem(R.id.menu_item_toggle_polling)
+        if (PollService.isServiceAlarmOn(activity!!)) {
+            toggleItem.setTitle(R.string.stop_polling)
+        } else {
+            toggleItem.setTitle(R.string.start_polling)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -96,6 +99,12 @@ class PhotoGalleryFragment : Fragment() {
             R.id.menu_item_clear -> {
                 QueryPreferences.setStoredQuery(activity!!, null)
                 updateItems()
+                true
+            }
+            R.id.menu_item_toggle_polling -> {
+                var shouldStartAlarm: Boolean = !PollService.isServiceAlarmOn(activity!!)
+                PollService.setServiceAlarm(activity!!, shouldStartAlarm)
+                activity!!.invalidateOptionsMenu()
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -5,6 +5,13 @@ import android.app.IntentService
 import android.content.Context
 import android.util.Log
 import android.net.ConnectivityManager
+import android.os.SystemClock
+import android.app.AlarmManager
+import android.app.PendingIntent
+import java.util.concurrent.TimeUnit
+import android.content.ClipData.newIntent
+
+
 
 
 class PollService : IntentService(TAG) {
@@ -36,8 +43,31 @@ class PollService : IntentService(TAG) {
 
     companion object {
         private const val TAG = "PollService"
-        fun newIntent(context: Context): Intent {
+        private var POLL_INTERVAL_MS: Long = TimeUnit.MINUTES.toMillis(1)
+        private fun newIntent(context: Context): Intent {
             return Intent(context, PollService::class.java)
+        }
+
+        fun setServiceAlarm(context: Context, isOn: Boolean) {
+            val i = PollService.newIntent(context)
+            val pi = PendingIntent.getService(context, 0, i, 0)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (isOn) {
+                alarmManager.setRepeating(
+                    AlarmManager.ELAPSED_REALTIME,
+                    SystemClock.elapsedRealtime(), POLL_INTERVAL_MS, pi
+                )
+            } else {
+                alarmManager.cancel(pi)
+                pi.cancel()
+            }
+        }
+
+        fun isServiceAlarmOn(context: Context): Boolean {
+            val i = PollService.newIntent(context)
+            val pi = PendingIntent
+                .getService(context, 0, i, PendingIntent.FLAG_NO_CREATE)
+            return pi != null
         }
     }
 }
