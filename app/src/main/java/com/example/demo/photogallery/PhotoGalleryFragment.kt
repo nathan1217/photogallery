@@ -16,6 +16,10 @@ import android.os.Handler
 import android.view.*
 import android.support.v4.view.MenuItemCompat.getActionView
 import android.support.v7.widget.SearchView
+import android.content.ClipData.newIntent
+import android.content.Intent
+
+
 
 
 class PhotoGalleryFragment : Fragment() {
@@ -27,6 +31,10 @@ class PhotoGalleryFragment : Fragment() {
         retainInstance = true
         setHasOptionsMenu(true)
         updateItems()
+
+        val i = PollService.newIntent(activity!!)
+        activity!!.startService(i)
+
         var responseHandler: Handler = Handler()
         mThumbnailDownloader = ThumbnailDownloader<PhotoHolder>(responseHandler)
 
