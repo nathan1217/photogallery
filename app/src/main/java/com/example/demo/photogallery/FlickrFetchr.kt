@@ -1,9 +1,12 @@
 package com.example.demo.photogallery
 
+import android.util.Log
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
+import kotlin.random.Random
 
 
 class FlickrFetchr constructor() {
@@ -46,12 +49,18 @@ class FlickrFetchr constructor() {
     @Throws(IOException::class)
     fun getItems(urlSpec: String): ArrayList<GalleryItem> {
         val items = ArrayList<GalleryItem>()
-//        getUrlString(urlSpec)
+        var existsItem: HashSet<Int> = HashSet<Int>()
+        getUrlString(urlSpec)
         for (i in 1..20) {
-            if (mKeyWord != null && i % mKeyWord!!.length != 0) {
-                continue
+            var id: UUID = UUID.randomUUID()
+            var random: Int = Random(id.hashCode()).nextInt(1, i + 1)
+            if (mKeyWord != null) {
+                if (existsItem.contains(random)) {
+                    continue
+                }
+                existsItem.add(random)
             }
-            items.add(GalleryItem(i.toString(), "mCaption_$i", URLS[i]))
+            items.add(GalleryItem(id.toString(), "mCaption_$i", URLS[random]))
         }
         return items
     }

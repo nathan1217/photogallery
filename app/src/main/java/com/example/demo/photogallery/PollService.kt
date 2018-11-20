@@ -1,18 +1,14 @@
 package com.example.demo.photogallery
 
+import android.app.*
 import android.content.Intent
-import android.app.IntentService
 import android.content.Context
 import android.util.Log
 import android.net.ConnectivityManager
 import android.os.SystemClock
-import android.app.AlarmManager
-import android.app.PendingIntent
 import java.util.concurrent.TimeUnit
-import android.content.ClipData.newIntent
 import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.app.NotificationCompat
-import android.content.ClipData.newIntent
 
 
 class PollService : IntentService(TAG) {
@@ -42,10 +38,22 @@ class PollService : IntentService(TAG) {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build()
-            val notificationManager = NotificationManagerCompat.from(this)
-            notificationManager.notify(0, notification)
+//            val notificationManager = NotificationManagerCompat.from(this)
+//            notificationManager.notify(0, notification)
+//            sendBroadcast(Intent(ACTION_SHOW_NOTIFICATION),PERM_PRIVATE)
+            showBackgroundNotification(0, notification);
         }
         QueryPreferences.setLastResultId(this, resultId)
+    }
+
+    private fun showBackgroundNotification(requestCode: Int, notification: Notification) {
+        val i = Intent(ACTION_SHOW_NOTIFICATION)
+        i.putExtra(REQUEST_CODE, requestCode)
+        i.putExtra(NOTIFICATION, notification)
+        sendOrderedBroadcast(
+            i, PERM_PRIVATE, null, null,
+            Activity.RESULT_OK, null, null
+        )
     }
 
     private fun isNetworkAvailableAndConnected(): Boolean {
@@ -55,8 +63,12 @@ class PollService : IntentService(TAG) {
     }
 
     companion object {
-        private const val TAG = "PollService"
+        const val TAG = "PollService"
         private var POLL_INTERVAL_MS: Long = TimeUnit.MINUTES.toMillis(1)
+        const val ACTION_SHOW_NOTIFICATION = "com.example.demo.photogallery.SHOW_NOTIFICATION"
+        const  val PERM_PRIVATE = "com.example.demo.photogallery.PRIVATE"
+        const val REQUEST_CODE = "REQUEST_CODE"
+        const val NOTIFICATION = "NOTIFICATION"
         private fun newIntent(context: Context): Intent {
             return Intent(context, PollService::class.java)
         }
@@ -74,6 +86,7 @@ class PollService : IntentService(TAG) {
                 alarmManager.cancel(pi)
                 pi.cancel()
             }
+            QueryPreferences.setAlarmOn(context, isOn);
         }
 
         fun isServiceAlarmOn(context: Context): Boolean {

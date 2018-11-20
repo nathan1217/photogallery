@@ -9,18 +9,13 @@ import android.support.v7.widget.RecyclerView
 import android.os.AsyncTask
 import android.util.Log
 import android.widget.ImageView
-import java.io.IOException
-import android.widget.TextView
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.view.*
-import android.support.v4.view.MenuItemCompat.getActionView
 import android.support.v7.widget.SearchView
-import android.content.ClipData.newIntent
-import android.content.Intent
 
 
-class PhotoGalleryFragment : Fragment() {
+class PhotoGalleryFragment : VisibleFragment() {
     private lateinit var mPhotoRecyclerView: RecyclerView
     private var mItems = ArrayList<GalleryItem>()
     private lateinit var mThumbnailDownloader: ThumbnailDownloader<PhotoHolder>
