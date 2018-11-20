@@ -6,9 +6,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.os.AsyncTask
 import android.util.Log
 import android.widget.ImageView
@@ -16,6 +13,9 @@ import java.io.IOException
 import android.widget.TextView
 import android.graphics.drawable.Drawable
 import android.os.Handler
+import android.view.*
+import android.support.v4.view.MenuItemCompat.getActionView
+import android.support.v7.widget.SearchView
 
 
 class PhotoGalleryFragment : Fragment() {
@@ -25,7 +25,8 @@ class PhotoGalleryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
-        FetchItemsTask().execute()
+        setHasOptionsMenu(true)
+        updateItems()
         var responseHandler: Handler = Handler()
         mThumbnailDownloader = ThumbnailDownloader<PhotoHolder>(responseHandler)
 
@@ -57,6 +58,26 @@ class PhotoGalleryFragment : Fragment() {
         return v
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, menuInflater)
+        menuInflater.inflate(R.menu.fragment_photo_gallery, menu)
+
+        val searchItem = menu.findItem(R.id.menu_item_search)
+        val searchView = searchItem.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(s: String): Boolean {
+                Log.d(TAG, "QueryTextSubmit: $s")
+                updateItems()
+                return true
+            }
+
+            override fun onQueryTextChange(s: String): Boolean {
+                Log.d(TAG, "QueryTextChange: $s")
+                return false
+            }
+        })
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         mThumbnailDownloader.quit()
@@ -67,6 +88,10 @@ class PhotoGalleryFragment : Fragment() {
         if (isAdded) {
             mPhotoRecyclerView.adapter = PhotoAdapter(mItems)
         }
+    }
+
+    private fun updateItems() {
+        FetchItemsTask().execute()
     }
 
     private inner class PhotoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
