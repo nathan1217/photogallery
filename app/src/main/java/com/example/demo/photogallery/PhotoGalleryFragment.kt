@@ -65,17 +65,33 @@ class PhotoGalleryFragment : Fragment() {
         val searchItem = menu.findItem(R.id.menu_item_search)
         val searchView = searchItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(s: String): Boolean {
-                Log.d(TAG, "QueryTextSubmit: $s")
+            override fun onQueryTextSubmit(keyWord: String): Boolean {
+                Log.d(TAG, "QueryTextSubmit: $keyWord")
+                QueryPreferences.setStoredQuery(activity!!, keyWord)
                 updateItems()
                 return true
             }
 
-            override fun onQueryTextChange(s: String): Boolean {
-                Log.d(TAG, "QueryTextChange: $s")
+            override fun onQueryTextChange(keyWord: String): Boolean {
+                Log.d(TAG, "QueryTextChange: $keyWord")
                 return false
             }
         })
+        searchView.setOnClickListener {
+            val query = QueryPreferences.getStoredQuery(activity!!)
+            searchView.setQuery(query, false)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item!!.itemId) {
+            R.id.menu_item_clear -> {
+                QueryPreferences.setStoredQuery(activity!!, null)
+                updateItems()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onDestroy() {
@@ -91,7 +107,8 @@ class PhotoGalleryFragment : Fragment() {
     }
 
     private fun updateItems() {
-        FetchItemsTask().execute()
+        val keyWord: String? = QueryPreferences.getStoredQuery(activity!!)
+        FetchItemsTask(keyWord).execute()
     }
 
     private inner class PhotoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -122,9 +139,10 @@ class PhotoGalleryFragment : Fragment() {
         }
     }
 
-    private inner class FetchItemsTask : AsyncTask<Void, Void, ArrayList<GalleryItem>>() {
+    private inner class FetchItemsTask constructor(var keyWord: String?) :
+        AsyncTask<Void, Void, ArrayList<GalleryItem>>() {
         override fun doInBackground(vararg params: Void): ArrayList<GalleryItem> {
-            return FlickrFetchr()
+            return FlickrFetchr(keyWord)
                 .getItems("https://www.baidu.com")
         }
 

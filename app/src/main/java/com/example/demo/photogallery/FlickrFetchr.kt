@@ -6,7 +6,13 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-class FlickrFetchr {
+class FlickrFetchr constructor() {
+    private var mKeyWord: String? = null
+
+    constructor(keyWord: String?) : this() {
+        mKeyWord = keyWord
+    }
+
     @Throws(IOException::class)
     fun getUrlBytes(urlSpec: String): ByteArray {
         val url = URL(urlSpec)
@@ -40,8 +46,11 @@ class FlickrFetchr {
     @Throws(IOException::class)
     fun getItems(urlSpec: String): ArrayList<GalleryItem> {
         val items = ArrayList<GalleryItem>()
-        getUrlString(urlSpec)
+//        getUrlString(urlSpec)
         for (i in 1..20) {
+            if (mKeyWord != null && i % mKeyWord!!.length != 0) {
+                continue
+            }
             items.add(GalleryItem(i.toString(), "mCaption_$i", URLS[i]))
         }
         return items
