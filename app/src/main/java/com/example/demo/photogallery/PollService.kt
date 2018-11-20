@@ -10,8 +10,9 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import java.util.concurrent.TimeUnit
 import android.content.ClipData.newIntent
-
-
+import android.support.v4.app.NotificationManagerCompat
+import android.support.v4.app.NotificationCompat
+import android.content.ClipData.newIntent
 
 
 class PollService : IntentService(TAG) {
@@ -21,7 +22,7 @@ class PollService : IntentService(TAG) {
         }
         val query = QueryPreferences.getStoredQuery(this)
         val lastResultId = QueryPreferences.getLastResultId(this)
-        val items: List<GalleryItem> = FlickrFetchr(query).getItems("https://www.baidu.com/")
+        val items: List<GalleryItem> = FlickrFetchr(query).getItems("https://www.baidu.com/") as List<GalleryItem>
 
         if (items.isEmpty()) {
             return
@@ -31,6 +32,18 @@ class PollService : IntentService(TAG) {
             Log.i(TAG, "Got an old result: $resultId")
         } else {
             Log.i(TAG, "Got a new result: $resultId")
+            val intent = PhotoGalleryActivity.newIntent(this)
+            val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+            val notification = NotificationCompat.Builder(this)
+                .setTicker(resources.getString(R.string.new_pictures_title))
+                .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                .setContentTitle(resources.getString(R.string.new_pictures_title))
+                .setContentText(resources.getString(R.string.new_pictures_text))
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
+            val notificationManager = NotificationManagerCompat.from(this)
+            notificationManager.notify(0, notification)
         }
         QueryPreferences.setLastResultId(this, resultId)
     }
